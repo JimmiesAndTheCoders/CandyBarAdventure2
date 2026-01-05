@@ -38,13 +38,13 @@ cd CandyBarAdventure2
 
 Use Lime to build and run the game:
 
-For Windows **Desktop**
+For Windows (Desktop)
 
 ```bash
 lime test windows
 ```
 
-> Note: You can replace `windows` with `mac`, `linux`, or `html5` depending on your target platform.
+> Note: You can replace `windows` with `mac`, `linux`, `html5`, or `neko` depending on your target platform.
 
 ### Step 3: Enjoy the Game
 
