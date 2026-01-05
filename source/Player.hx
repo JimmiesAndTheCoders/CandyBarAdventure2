@@ -46,6 +46,7 @@ class Player extends FlxSprite {
         // Jumping (only if on the ground)
         if (FlxG.keys.anyJustPressed([SPACE, UP, W]) && isTouching(FLOOR)) {
             velocity.y = -JUMP_FORCE;
+            FlxG.sound.play("assets/sounds/jump.wav");
         }
     }
 }
