@@ -3,6 +3,7 @@ package;
 import flixel.FlxG;
 import flixel.FlxState;
 import flixel.group.FlxGroup;
+import flixel.sound.FlxSound;
 
 class PlayState extends FlxState{
 	var player:Player;
@@ -10,6 +11,8 @@ class PlayState extends FlxState{
 	var particlePool:FlxGroup;
 
 	static inline var MAX_PARTICLES:Int = 50;
+
+	var sfxJump:FlxSound;
 
 	override public function create():Void {
 		super.create();
@@ -24,8 +27,11 @@ class PlayState extends FlxState{
 		}
 		add(particlePool);
 
+		sfxJump = FlxG.sound.load("assets/sounds/jump.wav");
+
 		player = new Player(50, 50);
 		player.particleManager = this;
+		player.jumpSound = sfxJump;
 		add(player);
 
 		FlxG.camera.follow(player, TOPDOWN, 1);
