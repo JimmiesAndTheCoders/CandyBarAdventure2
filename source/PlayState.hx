@@ -27,7 +27,7 @@ class PlayState extends FlxState{
 		}
 		add(particlePool);
 
-		sfxJump = FlxG.sound.load("assets/sounds/jump.wav");
+		sfxJump = FlxG.sound.load(AssetPaths.jump__wav);
 
 		player = new Player(50, 50);
 		player.particleManager = this;

@@ -4,6 +4,7 @@ import flixel.tile.FlxTilemap;
 import flixel.util.FlxColor;
 import openfl.display.BitmapData;
 import openfl.geom.Rectangle;
+import openfl.utils.Assets;
 
 class Level extends FlxTilemap {
 	static inline var TILE_SIZE:Int = 16;
@@ -13,17 +14,25 @@ class Level extends FlxTilemap {
 	public function new() {
 		super();
 
-		// 1. Generate the map data (CSV format)
-		var mapData:Array<Int> = generateMapData();
+		var mapDataString:String = "";
+		var csvPath:String = "assets/data/map.csv";
 
-		// 2. Generate a tileset image in memory
+		if (Assets.exists(csvPath)) {
+			mapDataString = Assets.getText(csvPath);
+		} else {
+			var dataArray:Array<Int> = generateMapData();
+		}
+
 		var tilesetBitmap = new BitmapData(TILE_SIZE * 2, TILE_SIZE, true, 0x00000000);
-		
 		var rect = new Rectangle(TILE_SIZE, 0, TILE_SIZE, TILE_SIZE);
 		tilesetBitmap.fillRect(rect, FlxColor.BLACK);
 
-		// 3. Load the map using the data and the generated bitmap
-		loadMapFromArray(mapData, LEVEL_WIDTH, LEVEL_HEIGHT, tilesetBitmap, TILE_SIZE, TILE_SIZE, null, 0, 1, 1);
+		if (Assets.exists(csvPath)) {
+			loadMapFromCSV(mapDataString, tilesetBitmap, TILE_SIZE, TILE_SIZE);
+		} else {
+			var mapDataArray:Array<Int> = generateMapData();
+			loadMapFromArray(mapDataArray, LEVEL_WIDTH, LEVEL_HEIGHT, tilesetBitmap, TILE_SIZE, TILE_SIZE, null, 0, 1, 1);
+		}
 	}
 
 	function generateMapData():Array<Int> {
