@@ -34,7 +34,7 @@ class PlayState extends FlxState{
 		player.jumpSound = sfxJump;
 		add(player);
 
-		FlxG.camera.follow(player, TOPDOWN, 1);
+		FlxG.camera.follow(player, LOCKON, 1);
 		FlxG.camera.setScrollBoundsRect(0, 0, level.width, level.height, true);
 	}
 
