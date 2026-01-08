@@ -12,6 +12,7 @@ class EditorState extends FlxState {
 
     override public function create() {
         FlxG.mouse.visible = true;
+        bgColor = 0x141730;
 
         data = MapGenerator.generateDefaultArray();
 
