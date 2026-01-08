@@ -11,6 +11,7 @@ class PlayState extends FlxState{
 	var level:Level;
 	var particlePool:FlxGroup;
 	var sfxJump:FlxSound;
+	var overrideData:Array<Int>;
 
 	static inline var MAX_PARTICLES:Int = 50;
 
@@ -21,11 +22,17 @@ class PlayState extends FlxState{
 	var startY:Float;
 	#end
 
+	public function new(?customData:Array<Int>) {
+		super();
+		this.overrideData = customData;
+	}
+
 	override public function create():Void {
+		FlxG.mouse.visible = false;
 		super.create();
 		bgColor = 0x1f2349;
 		
-		level = new Level();
+		level = new Level(overrideData);
 		add(level);
 
 		particlePool = new FlxGroup();
@@ -89,6 +96,12 @@ class PlayState extends FlxState{
 			}
 		}
 		#end
+
+		StateController.checkToggle();
+
+		if (FlxG.keys.justPressed.ENTER) {
+			FlxG.switchState(() -> new PlayState(overrideData));
+		}
 	}
 
 	public function spawnDustBurst(
