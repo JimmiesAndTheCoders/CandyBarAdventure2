@@ -1,5 +1,6 @@
-package;
+package ui;
 
+import level.Level;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.tweens.FlxTween;

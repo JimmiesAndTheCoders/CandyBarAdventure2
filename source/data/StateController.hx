@@ -1,5 +1,6 @@
-package;
+package data;
 
+import states.PlayState;
 import flixel.FlxG;
 
 class StateController {

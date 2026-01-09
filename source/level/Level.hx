@@ -1,4 +1,4 @@
-package;
+package level;
 
 import flixel.tile.FlxTilemap;
 import openfl.utils.Assets;

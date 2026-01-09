@@ -1,4 +1,4 @@
-package;
+package level;
 
 import openfl.display.BitmapData;
 import openfl.geom.Rectangle;

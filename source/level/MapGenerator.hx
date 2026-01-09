@@ -1,4 +1,4 @@
-package;
+package level;
 
 class MapGenerator {
     public static function generateDefaultArray():Array<Int> {

@@ -1,4 +1,4 @@
-package;
+package level;
 
 class LevelData {
     public static function arrayToCSV(grid:Array<Array<Int>>) {
