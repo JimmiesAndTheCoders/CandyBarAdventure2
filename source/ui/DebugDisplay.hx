@@ -1,5 +1,6 @@
 package ui;
 
+import entities.Player;
 import flixel.FlxG;
 import flixel.group.FlxSpriteGroup;
 import flixel.text.FlxText;

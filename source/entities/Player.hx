@@ -4,6 +4,7 @@ import flixel.FlxSprite;
 import flixel.FlxG;
 import flixel.util.FlxColor;
 import flixel.sound.FlxSound;
+import states.PlayState;
 
 class Player extends FlxSprite {
     // Physics Constants

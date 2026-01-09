@@ -1,5 +1,6 @@
 package data;
 
+import states.EditorState;
 import states.PlayState;
 import flixel.FlxG;
 
