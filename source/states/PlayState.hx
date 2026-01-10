@@ -11,6 +11,11 @@ import flixel.FlxState;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
 import flixel.sound.FlxSound;
+import flixel.text.FlxText;
+import openfl.utils.Assets;
+import flixel.tweens.FlxTween;
+import haxe.Json;
+
 
 class PlayState extends FlxState{
 	var player:Player;
@@ -18,6 +23,7 @@ class PlayState extends FlxState{
 	var particlePool:FlxGroup;
 	var sfxJump:FlxSound;
 	var overrideData:Array<Int>;
+	var levelLabel:FlxText;
 
 	static inline var MAX_PARTICLES:Int = 50;
 
@@ -37,6 +43,21 @@ class PlayState extends FlxState{
 		FlxG.mouse.visible = false;
 		super.create();
 		bgColor = 0x1f2349;
+
+		var rawJson:String = Assets.getText("assets/data/metadata.json");
+		var data:Dynamic = Json.parse(rawJson);
+		var displayString:String = data.levelId + ": " + data.title;
+
+		levelLabel = new FlxText(10, 0, 0, displayString, 32);
+		levelLabel.setFormat("assets/fonts/lounge.ttf", 32, FlxColor.WHITE, LEFT);
+		levelLabel.setBorderStyle(OUTLINE, FlxColor.BLACK, 2);
+		levelLabel.y = FlxG.height - levelLabel.height - 10;
+		levelLabel.scrollFactor.set(0, 0);
+		add(levelLabel);
+
+		FlxTween.tween(levelLabel, {alpha: 0}, 2, {startDelay: 3, onComplete: function(twn:FlxTween) {
+			levelLabel.destroy();
+		}});
 		
 		level = new Level(overrideData);
 		add(level);
