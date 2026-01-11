@@ -14,7 +14,7 @@ import flixel.text.FlxText;
 import openfl.utils.Assets;
 import flixel.tweens.FlxTween;
 import haxe.Json;
-
+import ui.DebugDisplay;
 
 class PlayState extends FlxState{
 	var player:Player;
