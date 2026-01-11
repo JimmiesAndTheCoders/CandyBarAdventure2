@@ -14,13 +14,13 @@ class DebugDisplay extends FlxSpriteGroup {
         super();
         _playerRef = player;
 
-        var bg = new flixel.FlxSprite().makeGraphic(220, 115, FlxColor.BLACK);
+        var bg = new flixel.FlxSprite().makeGraphic(220, 138, FlxColor.BLACK);
         bg.alpha = 0.6;
         add(bg);
 
-        _statsText = new FlxText(10, 10, 200, "", 12);
-        _statsText.color = FlxColor.WHITE;
-        _statsText.setFormat("assets/fonts/lounge.ttf");
+        _statsText = new FlxText(10, 10, 200, "", 16);
+        _statsText.setFormat("assets/fonts/lounge.ttf", 16, FlxColor.WHITE, LEFT);
+        _statsText.setBorderStyle(OUTLINE, FlxColor.BLACK, 2);
         add(_statsText);
 
         scrollFactor.set(0, 0);
