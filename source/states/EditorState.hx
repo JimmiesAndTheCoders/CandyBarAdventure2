@@ -9,6 +9,7 @@ import flixel.FlxG;
 import flixel.FlxState;
 import flixel.tile.FlxTilemap;
 import openfl.net.FileReference;
+import ui.DebugDisplay;
 
 class EditorState extends FlxState {
     var map:FlxTilemap;
