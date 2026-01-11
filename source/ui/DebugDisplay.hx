@@ -20,6 +20,7 @@ class DebugDisplay extends FlxSpriteGroup {
 
         _statsText = new FlxText(10, 10, 200, "", 12);
         _statsText.color = FlxColor.WHITE;
+        _statsText.setFormat("assets/fonts/lounge.ttf");
         add(_statsText);
 
         scrollFactor.set(0, 0);

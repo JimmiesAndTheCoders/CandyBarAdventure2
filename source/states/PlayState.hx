@@ -3,7 +3,6 @@ package states;
 import data.StateController;
 import data.AssetPaths;
 import entities.DustParticle;
-import ui.DebugDisplay;
 import entities.Player;
 import level.Level;
 import flixel.FlxG;
