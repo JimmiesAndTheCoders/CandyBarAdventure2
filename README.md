@@ -3,7 +3,7 @@
 ![Work in progress](https://img.shields.io/badge/status-work_in_progress-orange?style)
 ![HaxeFlixel](https://img.shields.io/badge/HaxeFlixel-%23141419?style=flat&logo=haxe&logoColor=fff&link=https%3A%2F%2Fhaxeflixel.com%2F)
 
-Firey's Candy Bar Adventure 2 is a fanmade sequel to the classic 2009 title "Firey's Candy Bar Adventure", created by Michael and Cary Huang, the same creators who created BFDI. (I like BFDI btw). This game is still in development, so everthing here is subject to change.
+Firey's Candy Bar Adventure 2 is a fanmade sequel to the classic 2009 title "Firey's Candy Bar Adventure", created by Michael and Cary Huang, the same creators who created BFDI. I like BFDI btw. This game is still in development, so everthing here is subject to change.
 
 ## Overview
 
