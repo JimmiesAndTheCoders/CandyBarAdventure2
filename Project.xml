@@ -4,7 +4,7 @@
 
 	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="Firey's Candy Bar Adventure 2" file="CandyBarAdventure2" main="Main" version="devlog2" company="JATM Games" />
+	<app title="Firey's Candy Bar Adventure 2" file="CandyBarAdventure2" main="Main" version="devbuild1" company="JATM Games" />
 
 	<!--The flixel preloader is not accurate in Chrome. You can use it regularly if you embed the swf into a html file
 		or you can set the actual size of your file manually at "FlxPreloaderBase-onUpdate-bytesTotal"-->
