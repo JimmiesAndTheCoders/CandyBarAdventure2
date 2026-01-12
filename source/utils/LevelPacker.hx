@@ -1,60 +1,61 @@
 package utils;
 
+import openfl.Assets;
+import haxe.io.BytesInput;
+import haxe.Json;
+import haxe.crypto.Crc32;
 import haxe.io.Bytes;
 import haxe.zip.Entry;
+import haxe.zip.Reader;
 import haxe.zip.Writer;
-import sys.io.File;
-import haxe.io.BytesOutput;
-import haxe.crypto.Crc32;
 
 class LevelPacker {
-    public static function saveLevel(fileName:String, csvContent:String, metaContent:String):Bool {
-        if (fileName == null || csvContent == null || metaContent == null) return false;
+	public static function packFromAssets(csvPath:String, metaPath:String):Bytes {
+		var csv:String = Assets.getText(csvPath);
+		var meta:String = Assets.getText(metaPath);
 
-        if (!StringTools.endsWith(fileName, ".fcba2lvl")) {
-            fileName += ".fcba2lvl";
+		return packLevel(csv, meta);
+	}
+
+	public static function packLevel(csv:String, meta:Dynamic):Bytes {
+		var out = new haxe.io.BytesOutput();
+		var writer = new Writer(out);
+		var entries = new List<Entry>();
+
+		var metaBytes = Bytes.ofString(meta);
+		entries.add(createEntry("meta.json", metaBytes));
+
+		var csvBytes = Bytes.ofString(csv);
+		entries.add(createEntry("data.csv", csvBytes));
+
+		writer.write(entries);
+		return out.getBytes();
+    }
+
+	public static function createEntry(name:String, data:Bytes):Entry {
+		return {
+			fileName: name,
+			fileSize: data.length,
+			dataSize: 0,
+			data: data,
+			crc32: Crc32.make(data),
+			compressed: true,
+			fileTime: Date.now()
+		};
+	}
+
+    public static function unpack(bytes:Bytes):{csv:String, meta:Dynamic} {
+        var input = new BytesInput(bytes);
+        var reader = new Reader(input);
+        var entries = reader.read();
+
+        var result = {csv: "", meta: null};
+
+        for (entry in entries) {
+            if (entry.fileName == "data.csv") result.csv = entry.data.toString();
+            else if (entry.fileName == "meta.json") result.meta = Json.parse(entry.data.toString());
         }
 
-        try {
-            var entries:List<Entry> = new List<Entry>();
-
-            var csvBytes = Bytes.ofString(csvContent);
-            var csvEntry:Entry = {
-                fileName: "level_data.csv",
-                fileSize: csvBytes.length,
-                fileTime: Date.now(),
-                compressed: false,
-                dataSize: csvBytes.length,
-                data: csvBytes,
-                crc32: Crc32.make(csvBytes)
-            };
-            entries.add(csvEntry);
-
-            var metaBytes = Bytes.ofString(metaContent);
-            var metaEntry:Entry = {
-                fileName: "metadata.json",
-                fileSize: metaBytes.length,
-                fileTime: Date.now(),
-                compressed: false,
-                dataSize: metaBytes.length,
-                data: metaBytes,
-                crc32: Crc32.make(metaBytes)
-            };
-            entries.add(metaEntry);
-
-            var output = new BytesOutput();
-            var writer = new Writer(output);
-
-            writer.write(entries);
-
-            // Only for desktop/mobile targets, not web targets like HTML5
-            File.saveBytes(fileName, output.getBytes());
-
-            trace("Successfully saved level pack to: " + fileName);
-            return true;
-        } catch (e:Dynamic) {
-            trace("Error saving level pack: " + e);
-            return false;
-        }
+        return result;
     }
 }

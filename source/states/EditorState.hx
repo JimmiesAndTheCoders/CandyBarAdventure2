@@ -1,5 +1,7 @@
 package states;
 
+import openfl.net.FileFilter;
+import openfl.Assets;
 import level.LevelGraphics;
 import level.Level;
 import ui.Notification;
@@ -9,11 +11,17 @@ import flixel.FlxG;
 import flixel.FlxState;
 import flixel.tile.FlxTilemap;
 import openfl.net.FileReference;
+import utils.LevelPacker;
+import openfl.events.Event;
+import haxe.io.Bytes;
+import haxe.Json;
 
 class EditorState extends FlxState {
     var map:FlxTilemap;
     var data:Array<Int>;
     var currentTile:Int = 1;
+    var _fileRef:FileReference;
+    var notice:Notification;
 
     override public function create() {
         FlxG.mouse.visible = true;
@@ -72,9 +80,48 @@ class EditorState extends FlxState {
         );
     }
 
-    function saveLevel() {
-        var csvContent = MapGenerator.arrayToCSV(data, Level.LEVEL_WIDTH);
-        var fr = new FileReference();
-        fr.save(csvContent, "map.csv");
+    function saveLevel():Void {
+        var csv = Assets.getText("assets/data/level_data.csv");
+        var metaRaw = Assets.getText("assets/data/metadata.json");
+        var meta = Json.parse(metaRaw);
+        meta.lastModified = Date.now().toString();
+        
+        var packedBytes = LevelPacker.packLevel(csv, meta);
+
+        _fileRef = new FileReference();
+        _fileRef.addEventListener(Event.COMPLETE, onSaveComplete);
+
+        var fileName = (meta.title != null) ? meta.title + ".fcba2lvl" : "level.fcba2lvl";
+        _fileRef.save(packedBytes.getData(), fileName);
+    }
+
+    public function onSaveComplete(event:Event):Void {
+        trace("File saved successfully.");
+        notice = new Notification("Level file saved successfully!");
+        notice.show(this);
+    }
+
+    public function loadLevel():Void {
+        _fileRef = new FileReference();
+        _fileRef.addEventListener(Event.SELECT, onFileSelected);
+        _fileRef.addEventListener(Event.COMPLETE, onLoadComplete);
+
+        var filter = new FileFilter("Firey's Candy Bar Adventure 2 Level", "*.fcba2lvl");
+        _fileRef.browse([filter]);
+    }
+
+    function onFileSelected(e:Event):Void {
+        _fileRef.load();
+    }
+
+    function onLoadComplete(e:Event):Void {
+        var rawBytes = Bytes.ofData(_fileRef.data);
+        var unpacked = LevelPacker.unpack(rawBytes);
+
+        trace("Loaded level:", unpacked.meta.title);
+        trace("Map data length:", unpacked.csv.length);
+
+        var notice = new Notification("Level loaded: " + unpacked.meta.title);
+        notice.show(this);
     }
 }
