@@ -47,7 +47,7 @@ class PlayState extends FlxState {
         super.create();
         bgColor = 0x1f2349;
 
-        var customLevelPath = "assets/data/test.fcba2lvl";  // Change this path if your file has a different name
+        var customLevelPath = "assets/data/test.fcba2lvl";
         if (Assets.exists(customLevelPath)) {
             try {
                 var bytes = Assets.getBytes(customLevelPath);
