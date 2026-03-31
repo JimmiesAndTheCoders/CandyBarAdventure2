@@ -66,7 +66,7 @@ class PlayState extends FlxState {
                     overrideMeta = unpacked.meta;
                 }
             } catch (e:Dynamic) {
-                // Optional: Add error handling, e.g., trace("Failed to load custom level: " + e);
+                trace("Failed to load custom level: " + e);
             }
         }
 

@@ -8,7 +8,8 @@ import flixel.tweens.FlxTween;
 class Notification extends FlxText {
     public function new(message:String) {
         super(0, Level.LEVEL_HEIGHT * Level.TILE_SIZE - 30, 0, message, 16);
-        setFormat(null, 16, FlxColor.YELLOW, CENTER);
+        setFormat("assets/fonts/lounge.ttf", 16, FlxColor.YELLOW, CENTER);
+        setBorderStyle(OUTLINE, FlxColor.BLACK, 2);
         screenCenter(X);
         scrollFactor.set(0, 0);
     }
