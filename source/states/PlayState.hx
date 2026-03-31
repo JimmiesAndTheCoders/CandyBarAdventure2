@@ -15,145 +15,167 @@ import openfl.utils.Assets;
 import flixel.tweens.FlxTween;
 import haxe.Json;
 import ui.DebugDisplay;
+import utils.LevelPacker;
 
-class PlayState extends FlxState{
-	var player:Player;
-	var level:Level;
-	var particlePool:FlxGroup;
-	var sfxJump:FlxSound;
-	var overrideData:Array<Int>;
-	var levelLabel:FlxText;
+class PlayState extends FlxState {
+    var player:Player;
+    var level:Level;
+    var particlePool:FlxGroup;
+    var sfxJump:FlxSound;
+    
+    var overrideData:Array<Int>;
+    var overrideMeta:Dynamic;
+    
+    var levelLabel:FlxText;
 
-	static inline var MAX_PARTICLES:Int = 50;
+    static inline var MAX_PARTICLES:Int = 50;
 
-	#if debug
-	var debugDisplay:DebugDisplay;
+    #if debug
+    var debugDisplay:DebugDisplay;
+    var startX:Float;
+    var startY:Float;
+    #end
 
-	var startX:Float;
-	var startY:Float;
-	#end
+    public function new(?customData:Array<Int>, ?customMeta:Dynamic) {
+        super();
+        this.overrideData = customData;
+        this.overrideMeta = customMeta;
+    }
 
-	public function new(?customData:Array<Int>) {
-		super();
-		this.overrideData = customData;
-	}
+    override public function create():Void {
+        FlxG.mouse.visible = false;
+        super.create();
+        bgColor = 0x1f2349;
 
-	override public function create():Void {
-		FlxG.mouse.visible = false;
-		super.create();
-		bgColor = 0x1f2349;
+        var customLevelPath = "assets/data/test.fcba2lvl";  // Change this path if your file has a different name
+        if (Assets.exists(customLevelPath)) {
+            try {
+                var bytes = Assets.getBytes(customLevelPath);
+                var unpacked = LevelPacker.unpack(bytes);
+                if (unpacked != null) {
+                    var lines = unpacked.csv.split("\n");
+                    var data = [];
+                    for (line in lines) {
+                        if (line == "") continue;
+                        var vals = line.split(",");
+                        for (v in vals) {
+                            if (v != "") data.push(Std.parseInt(v));
+                        }
+                    }
+                    overrideData = data;
+                    overrideMeta = unpacked.meta;
+                }
+            } catch (e:Dynamic) {
+                // Optional: Add error handling, e.g., trace("Failed to load custom level: " + e);
+            }
+        }
 
-		var rawJson:String = Assets.getText("assets/data/metadata.json");
-		var data:Dynamic = Json.parse(rawJson);
-		var displayString:String = data.levelId + ": " + data.title;
+        var displayString:String = "";
+        
+        if (overrideMeta != null) {
+            var title = overrideMeta.title != null ? overrideMeta.title : "Custom Level";
+            displayString = "USER: " + title;
+        } else {
+            try {
+                var rawJson:String = Assets.getText("assets/data/metadata.json");
+                var data:Dynamic = Json.parse(rawJson);
+                displayString = data.levelId + ": " + data.title;
+            } catch (e:Dynamic) {
+                displayString = "Unknown Level";
+            }
+        }
 
-		levelLabel = new FlxText(10, 0, 0, displayString, 32);
-		levelLabel.setFormat("assets/fonts/lounge.ttf", 32, FlxColor.WHITE, LEFT);
-		levelLabel.setBorderStyle(OUTLINE, FlxColor.BLACK, 2);
-		levelLabel.y = FlxG.height - levelLabel.height - 10;
-		levelLabel.scrollFactor.set(0, 0);
-		add(levelLabel);
+        levelLabel = new FlxText(10, 0, 0, displayString, 32);
+        levelLabel.setFormat("assets/fonts/lounge.ttf", 32, FlxColor.WHITE, LEFT);
+        levelLabel.setBorderStyle(OUTLINE, FlxColor.BLACK, 2);
+        levelLabel.y = FlxG.height - levelLabel.height - 10;
+        levelLabel.scrollFactor.set(0, 0);
+        add(levelLabel);
 
-		FlxTween.tween(levelLabel, {alpha: 0}, 2, {startDelay: 3, onComplete: function(twn:FlxTween) {
-			levelLabel.destroy();
-		}});
-		
-		level = new Level(overrideData);
-		add(level);
+        FlxTween.tween(levelLabel, {alpha: 0}, 2, {
+            startDelay: 3, 
+            onComplete: function(twn:FlxTween) {
+                if (levelLabel != null) levelLabel.destroy();
+            }
+        });
+        
+        level = new Level(overrideData);
+        add(level);
 
-		particlePool = new FlxGroup();
-		for (i in 0...MAX_PARTICLES) {
-			particlePool.add(cast(new DustParticle(), DustParticle));
-		}
-		add(particlePool);
+        particlePool = new FlxGroup();
+        for (i in 0...MAX_PARTICLES) {
+            particlePool.add(new DustParticle());
+        }
+        add(particlePool);
 
-		sfxJump = FlxG.sound.load(AssetPaths.jump__wav);
+        sfxJump = FlxG.sound.load(AssetPaths.jump__wav);
 
-		player = new Player(50, 50);
-		player.particleManager = this;
-		player.jumpSound = sfxJump;
-		add(player);
+        player = new Player(50, 50);
+        player.particleManager = this;
+        player.jumpSound = sfxJump;
+        add(player);
 
-		FlxG.camera.follow(player, LOCKON, 1);
-		FlxG.camera.setScrollBoundsRect(0, 0, level.width, level.height, true);
+        FlxG.camera.follow(player, LOCKON, 1);
+        
+        FlxG.camera.setScrollBoundsRect(0, 0, level.width, level.height, true);
 
-		#if debug
-		FlxG.debugger.drawDebug = true;
-		debugDisplay = new DebugDisplay(player);
-		add(debugDisplay);
+        #if debug
+        FlxG.debugger.drawDebug = true;
+        debugDisplay = new DebugDisplay(player);
+        add(debugDisplay);
+        startX = player.x;
+        startY = player.y;
+        #end
+    }
 
-		startX = player.x;
-		startY = player.y;
-		#end
-	}
+    override public function update(elapsed:Float):Void {
+        super.update(elapsed);
+        FlxG.collide(player, level);
 
-	override public function update(elapsed:Float):Void {
-		super.update(elapsed);
-		FlxG.collide(player, level);
+        #if debug
+        if (FlxG.keys.justPressed.R) {
+            player.setPosition(startX, startY);
+            player.velocity.set(0, 0);
+        }
+        
+        if (FlxG.keys.justPressed.G) {
+            if (player.acceleration.y != 0) {
+                player.acceleration.y = 0;
+                player.velocity.y = 0;
+                player.color = 0x601477;
+            } else {
+                player.acceleration.y = 600;
+                player.color = FlxColor.ORANGE;
+            }
+        }
 
-		#if debug
-		if (FlxG.keys.justPressed.H) {
-			FlxG.debugger.drawDebug = !FlxG.debugger.drawDebug;
-		}
+        if (player.acceleration.y == 0) {
+            if (FlxG.keys.pressed.W || FlxG.keys.pressed.UP) player.velocity.y = -300;
+            else if (FlxG.keys.pressed.S || FlxG.keys.pressed.DOWN) player.velocity.y = 300;
+            else player.velocity.y = 0;
+        }
+        #end
 
-		if (FlxG.keys.justPressed.R) {
-			player.setPosition(startX, startY);
-			player.velocity.set(0, 0);
-		}
+        StateController.checkToggle();
 
-		if (FlxG.keys.justPressed.G) {
-			if (player.acceleration.y != 0) {
-				player.acceleration.y = 0;
-				player.velocity.y = 0;
-				player.color = 0x601477;
-			} else {
-				player.acceleration.y = 600;
-				player.color = FlxColor.ORANGE;
-			}
-		}
+        if (FlxG.keys.justPressed.ENTER) {
+            FlxG.switchState(() -> new PlayState(overrideData, overrideMeta));
+        }
+    }
 
-		if (player.acceleration.y == 0) {
-			if (FlxG.keys.pressed.W || FlxG.keys.pressed.UP) {
-				player.velocity.y = -300;
-			} else if (FlxG.keys.pressed.S || FlxG.keys.pressed.DOWN) {
-				player.velocity.y = 300;
-			} else {
-				player.velocity.y = 0;
-			}
-		}
-		#end
+    public function spawnDustBurst(x:Float, y:Float, count:Int, minX:Float, maxX:Float, minY:Float, maxY:Float):Void {
+        for (i in 0...count) {
+            var particle = cast(particlePool.getFirstDead(), DustParticle);
+            if (particle != null) {
+                particle.resetParticle(x, y, FlxG.random.float(minX, maxX), FlxG.random.float(minY, maxY));
+            }
+        }
+    }
 
-		StateController.checkToggle();
-
-		if (FlxG.keys.justPressed.ENTER) {
-			FlxG.switchState(() -> new PlayState(overrideData));
-		}
-	}
-
-	public function spawnDustBurst(
-		x:Float,
-		y:Float,
-		count:Int,
-		minX:Float,
-		maxX:Float,
-		minY:Float,
-		maxY:Float
-	):Void {
-		for (i in 0...count) {
-			var particle = cast(particlePool.getFirstDead(), DustParticle);
-			if (particle != null) {
-				var xVel = FlxG.random.float(minX, maxX);
-				var yVel = FlxG.random.float(minY, maxY);
-				particle.resetParticle(x, y, xVel, yVel);
-			}
-		}
-	}
-	public function spawnDustTrail(x:Float, y:Float):Void {
-		var particle = cast(particlePool.getFirstDead(), DustParticle);
-		if (particle != null) {
-			var xVel = FlxG.random.float(-10, 10);
-			var yVel = FlxG.random.float(-30, 10);
-			particle.resetParticle(x, y, xVel, yVel);
-		}
-	}
+    public function spawnDustTrail(x:Float, y:Float):Void {
+        var particle = cast(particlePool.getFirstDead(), DustParticle);
+        if (particle != null) {
+            particle.resetParticle(x, y, FlxG.random.float(-10, 10), FlxG.random.float(-30, 10));
+        }
+    }
 }

@@ -1,1 +1,1 @@
-This is where the level CSV files go here.
+This is where the Firey's Candy Bar Adventure 2 level files go here.
