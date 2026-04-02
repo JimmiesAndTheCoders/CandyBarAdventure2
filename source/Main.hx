@@ -3,7 +3,7 @@ package;
 import flixel.FlxSprite;
 import flixel.FlxGame;
 import openfl.display.Sprite;
-import utils.CrashHandler; // Import our new utility
+import utils.CrashHandler;
 
 class Main extends Sprite {
     public function new() {
